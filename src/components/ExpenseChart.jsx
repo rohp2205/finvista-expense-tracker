@@ -1,31 +1,67 @@
 "use client"
 
-import { Pie } from "react-chartjs-2"
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
+import {
+PieChart,
+Pie,
+Cell,
+Tooltip,
+Legend
+} from "recharts"
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+export default function ExpenseChart({ expenses }){
 
-export default function ExpenseChart({expenses}){
+const categoryTotals = {}
 
- const categories = {}
+expenses.forEach(e=>{
 
- expenses.forEach(e=>{
-   categories[e.category] =
-   (categories[e.category] || 0) + Number(e.amount)
- })
+if(!categoryTotals[e.category]){
 
- const data = {
-  labels:Object.keys(categories),
-  datasets:[
-   {
-    data:Object.values(categories)
-   }
-  ]
- }
+categoryTotals[e.category] = 0
 
- return (
-  <div className="w-96">
-   <Pie data={data}/>
-  </div>
- )
+}
+
+categoryTotals[e.category] += Number(e.amount)
+
+})
+
+const data =
+Object.keys(categoryTotals).map(cat=>({
+
+name: cat,
+value: categoryTotals[cat]
+
+}))
+
+const COLORS =
+["#6366f1","#22c55e","#f59e0b","#ef4444","#06b6d4"]
+
+return(
+
+<PieChart width={400} height={300}>
+
+<Pie
+data={data}
+dataKey="value"
+nameKey="name"
+outerRadius={100}
+
+>
+
+{data.map((entry,index)=>(
+<Cell
+key={index}
+fill={COLORS[index % COLORS.length]}
+/>
+))}
+
+</Pie>
+
+<Tooltip/>
+
+<Legend/>
+
+</PieChart>
+
+)
+
 }

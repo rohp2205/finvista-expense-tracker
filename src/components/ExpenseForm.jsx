@@ -10,12 +10,20 @@ export default function ExpenseForm() {
  const [category,setCategory] = useState("")
 
  const addExpense = async () => {
+   const { data: { user } } = await supabase.auth.getUser()
 
    const { error } = await supabase
-   .from("expenses")
-   .insert([{title,amount,category}])
+     .from("expenses")
+     .insert([
+       {
+         title,
+         amount,
+         category,
+         user_id: user?.id,
+       },
+     ])
 
-   if(!error){
+   if (!error) {
      alert("Expense Added")
    }
  }
